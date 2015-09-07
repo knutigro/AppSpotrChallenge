@@ -43,14 +43,10 @@ func fetchChallenge(completion: (challenge: Challenge?, error: NSError?) -> Void
     var error: NSError?
     
     if let data = NSURLConnection.sendSynchronousRequest(request, returningResponse: response, error:&error) {
-        if error == nil {
-            if let parsedObject: AnyObject? = NSJSONSerialization.JSONObjectWithData(data,
-                options: NSJSONReadingOptions.AllowFragments,
-                error:&error) as? NSDictionary {
-                    if let challengeJSON = parsedObject as? NSDictionary, let question = challengeJSON["question"] as? String, let quiz = challengeJSON["quiz"] as? [String]  {
-                        challenge = Challenge(question: question, quiz: quiz)
-                    }
-            }
+        if let json = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.AllowFragments, error:&error) as? NSDictionary,
+            let question = json["question"] as? String,
+            let quiz = json["quiz"] as? [String] {
+                challenge = Challenge(question: question, quiz: quiz)
         }
     }
     
